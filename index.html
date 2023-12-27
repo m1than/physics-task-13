@@ -4,57 +4,103 @@
     <meta charset="UTF-8">
     <title>Закон движения материальной точки</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.4.4/math.min.js"></script>
-    <!-- <script src="main.js"></script> -->
+    <style>
+        #myCanvas {
+            border: 1px solid black;
+            margin: 30px;
+        }
+    </style>
+    <script>
+    function drawAxes(ctx) {
+      ctx.beginPath();
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 1;
+  
+      // Ось X
+      ctx.moveTo(0, ctx.canvas.height / 2);
+      ctx.lineTo(ctx.canvas.width, ctx.canvas.height / 2);
+  
+      // Ось Y
+      ctx.moveTo(ctx.canvas.width / 2, 0);
+      ctx.lineTo(ctx.canvas.width / 2, ctx.canvas.height);
+  
+      ctx.stroke();
+  }
+  
+  function drawArrow(ctx, x, y, phi) {
+      const endX = x + 20 * Math.cos(phi);
+      const endY = y - 20 * Math.sin(phi);
+  
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(endX, endY);
+      ctx.lineTo(endX - 5 * Math.cos(phi - Math.PI / 6), endY + 5 * Math.sin(phi - Math.PI / 6));
+      ctx.moveTo(endX, endY);
+      ctx.lineTo(endX - 5 * Math.cos(phi + Math.PI / 6), endY + 5 * Math.sin(phi + Math.PI / 6));
+      ctx.stroke();
+  }
+  
+  function drawPointAndArrow(ctx, x, y, phi) {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      drawAxes(ctx);
+      ctx.fillStyle = 'red';
+      ctx.beginPath();
+      ctx.arc(x + ctx.canvas.width / 2, -y + ctx.canvas.height / 2, 5, 0, 2 * Math.PI);
+      ctx.fill();
+      drawArrow(ctx, x + ctx.canvas.width / 2, -y + ctx.canvas.height / 2, phi);
+  }
+  
+  function calculateMotion() {
+      const x0 = parseFloat(document.getElementById('initialX').value);
+      const y0 = parseFloat(document.getElementById('initialY').value);
+      const v0 = parseFloat(document.getElementById('initialV').value);
+      const phi0 = parseFloat(document.getElementById('initialPhi').value) * Math.PI / 180;
+      const forceLaw = document.getElementById('forceLaw').value;
+      const forceAngle = parseFloat(document.getElementById('forceAngle').value) * Math.PI / 180;
+      const endTime = parseFloat(document.getElementById('endTime').value);
+      
+      let x = x0;
+      let y = y0;
+      let vx = v0 * Math.cos(phi0);
+      let vy = v0 * Math.sin(phi0);
+      let t = 0;
+      const ctx = document.getElementById('myCanvas').getContext('2d');
+      drawAxes(ctx);
+  
+      const interval = setInterval(() => {
+          if (t > endTime) {
+              clearInterval(interval);
+              return;
+          }
+  
+          const scope = { x, y, vx, vy, t };
+          const F = math.evaluate(forceLaw, scope);
+          const ax = F * Math.cos(forceAngle);
+          const ay = F * Math.sin(forceAngle);
+          
+          vx += ax;
+          vy += ay;
+          x += vx;
+          y += vy;
+          t += 1;
+  
+          const currentPhi = Math.atan2(vy, vx);
+          drawPointAndArrow(ctx, x, y, currentPhi);
+      }, 1000);
+  }</script>
 </head>
 <body>
     <h1>Расчёт движения материальной точки</h1>
     <form id="motionForm">
-        <input type="number" id="initialX" placeholder="x_0">
-        <input type="number" id="initialY" placeholder="y_0">
-        <input type="number" id="initialV" placeholder="V_0">
-        <input type="number" id="initialPhi" placeholder="Угол направления скорости φ">
-        <input type="text" id="forceLaw" placeholder="Закон силы F">
+        <input type="number" id="initialX" placeholder="Начальная координата x">
+        <input type="number" id="initialY" placeholder="Начальная координата y">
+        <input type="number" id="initialV" placeholder="Начальная скорость V">
+        <input type="number" id="initialPhi" placeholder="Угол направления скорости φ (градусы)">
+        <input type="text" id="forceLaw" placeholder="Закон силы F (например, '-k * x')">
         <input type="number" id="forceAngle" placeholder="Угол действия силы (градусы)">
-        <input type="number" id="endTime" placeholder="Конечное время">
+        <input type="number" id="endTime" placeholder="Конечное время (секунды)">
         <button type="button" onclick="calculateMotion()">Рассчитать движение</button>
     </form>
-    <div id="output"></div>
-    <script>
-      function calculateMotion() {
-  const x0 = parseFloat(document.getElementById('initialX').value);
-  const y0 = parseFloat(document.getElementById('initialY').value);
-  const v0 = parseFloat(document.getElementById('initialV').value);
-  const phi0 = parseFloat(document.getElementById('initialPhi').value) * Math.PI / 180;
-  const forceLaw = document.getElementById('forceLaw').value;
-  const forceAngle = parseFloat(document.getElementById('forceAngle').value) * Math.PI / 180;
-  const endTime = parseFloat(document.getElementById('endTime').value);
-
-  let x = x0;
-  let y = y0;
-  let vx = v0 * Math.cos(phi0);
-  let vy = v0 * Math.sin(phi0);
-  let t = 0;
-  let output = `t: 0, x: 0, y: 0, v: 0, F: 0<br>`;
-
-  while (t <= endTime) {
-    const scope = { x, y, vx, vy, t };
-    const F = math.evaluate(forceLaw, scope);
-    const ax = F * Math.cos(forceAngle);
-    const ay = F * Math.sin(forceAngle);
-
-    vx += ax;
-    vy += ay;
-    x += vx;
-    y += vy;
-    t += 1;
-
-    const currentPhi = Math.atan2(vy, vx);
-    output += `t: ${t}, x: ${x.toFixed(2)}, y: ${y.toFixed(2)}, v: ${(Math.sqrt(vx ^ 2 + vy ^ 2).toFixed(2))}, F: ${F.toFixed(2)}, φ: ${(currentPhi * 180 / Math.PI).toFixed(2)}<br>`;
-  }
-
-  document.getElementById('output').innerHTML = output;
-}
-
-    </script>
+    <canvas id="myCanvas" width="1000" height="800"></canvas>
 </body>
 </html>
