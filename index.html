@@ -64,6 +64,7 @@
       let vx = v0 * Math.cos(phi0);
       let vy = v0 * Math.sin(phi0);
       let t = 0;
+      let v = Math.sqrt(vx^2+vy^2);
       const ctx = document.getElementById('myCanvas').getContext('2d');
       drawAxes(ctx);
   
@@ -73,7 +74,7 @@
               return;
           }
   
-          const scope = { x, y, vx, vy, t };
+          const scope = { x, y, v, t };
           const F = math.evaluate(forceLaw, scope);
           const ax = F * Math.cos(forceAngle);
           const ay = F * Math.sin(forceAngle);
