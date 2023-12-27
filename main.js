@@ -1,24 +1,34 @@
-import './style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.js'
+function calculateMotion() {
+  const x0 = parseFloat(document.getElementById('initialX').value);
+  const y0 = parseFloat(document.getElementById('initialY').value);
+  const v0 = parseFloat(document.getElementById('initialV').value);
+  const phi0 = parseFloat(document.getElementById('initialPhi').value) * Math.PI / 180;
+  const forceLaw = document.getElementById('forceLaw').value;
+  const forceAngle = parseFloat(document.getElementById('forceAngle').value) * Math.PI / 180;
+  const endTime = parseFloat(document.getElementById('endTime').value);
 
-document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
-  </div>
-`
+  let x = x0;
+  let y = y0;
+  let vx = v0 * Math.cos(phi0);
+  let vy = v0 * Math.sin(phi0);
+  let t = 0;
+  let output = `t: 0, x: 0, y: 0, v: 0, F: 0<br>`;
 
-setupCounter(document.querySelector('#counter'))
+  while (t <= endTime) {
+    const scope = { x, y, vx, vy, t };
+    const F = math.evaluate(forceLaw, scope);
+    const ax = F * Math.cos(forceAngle);
+    const ay = F * Math.sin(forceAngle);
+
+    vx += ax;
+    vy += ay;
+    x += vx;
+    y += vy;
+    t += 1;
+
+    const currentPhi = Math.atan2(vy, vx);
+    output += `t: ${t}, x: ${x.toFixed(2)}, y: ${y.toFixed(2)}, v: ${(Math.sqrt(vx ^ 2 + vy ^ 2).toFixed(2))}, F: ${F.toFixed(2)}, φ: ${(currentPhi * 180 / Math.PI).toFixed(2)}<br>`;
+  }
+
+  document.getElementById('output').innerHTML = output;
+}

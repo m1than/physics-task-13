@@ -1,13 +1,23 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/main.js"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <title>Закон движения материальной точки</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.4.4/math.min.js"></script>
+</head>
+<body>
+    <h1>Расчёт движения материальной точки</h1>
+    <form id="motionForm">
+        <input type="number" id="initialX" placeholder="Начальная координата x">
+        <input type="number" id="initialY" placeholder="Начальная координата y">
+        <input type="number" id="initialV" placeholder="Начальная скорость V">
+        <input type="number" id="initialPhi" placeholder="Угол направления скорости φ (градусы)">
+        <input type="text" id="forceLaw" placeholder="Закон силы F (например, '-k * x')">
+        <input type="number" id="forceAngle" placeholder="Угол действия силы (градусы)">
+        <input type="number" id="endTime" placeholder="Конечное время (секунды)">
+        <button type="button" onclick="calculateMotion()">Рассчитать движение</button>
+    </form>
+    <div id="output"></div>
+    <script src="main.js"></script>
+</body>
 </html>
